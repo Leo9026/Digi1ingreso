@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REGISTRO DE HORA EMPLEADOS A BODEGA DIGITAL</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #0e6caaea;
+            --secondary-color: #2ecc71;
+            --danger-color: #f64633;
+            --background-color: #398da1;
+            --text-color: #34495e;
+            --alkosto-orange: #FF6600;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 0;
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 10px;
+            background-color: #efebf4;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: var(--primary-color);
+        }
+
+        .form-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            flex: 1 1 200px;
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="datetime-local"],
+        input[type="url"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            text-transform: uppercase;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: var(--primary-color);
+            color: #e6d7c5;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background-color: #1e6493;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        button:disabled {
+            background-color: #5bec8b;
+            cursor: not-allowed;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #e6e6e6;
+        }
+
+        .btn-container {
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        #borrar {
+            background-color: var(--danger-color);
+        }
+
+        #borrar:hover {
+            background-color: #c0392b;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background-color: #f1f1f1;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .tab.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .checkbox-group, .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .checkbox-group label, .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: normal;
+        }
+
+        .checkbox-group input[type="checkbox"], .radio-group input[type="radio"] {
+            width: 16px;
+            height: 16px;
+        }
+
+        .checkbox-group input[type="checkbox"]:checked, .radio-group input[type="radio"]:checked {
+            accent-color: #24639d;
+        }
+
+        .radio-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            justify-content: flex-start;
+        }
+
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            height: 40px;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        .radio-group label:hover {
+            background-color: #f0f0f0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .radio-group input[type="radio"] {
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .radio-group input[type="radio"]:checked + span {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .imagen-container {
+            width: 100%;
+            max-width: 200px;
+            height: 133px;
+            margin: 0 auto 20px;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(255, 102, 0, 0.5);
+        }
+
+        .imagen-superior {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        #mostrar-todos {
+            background-color: var(--secondary-color);
+            margin-left: 10px;
+        }
+
+        #mostrar-todos:hover {
+            background-color: #27ae60;
+        }
+
+        #login-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        #login-form {
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        #login-form h2 {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        #login-form input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        #login-form button {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #login-form button:hover {
+            background-color: #1e6493;
+        }
+
+        .header-icon {
+            font-size: 24px;
+            margin: 0 10px;
+            color: var(--primary-color);
+        }
+
+        .generar-salida {
+            background-color: var(--primary-color);
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+
+        .generar-salida.clicked {
+            background-color: var(--alkosto-orange);
+        }
+
+        @keyframes cartAnimation {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
+        }
+
+        .cart-icon {
+            animation: cartAnimation 4s infinite;
+        }
+
+        .section-separator {
+            border-top: 2px solid var(--primary-color);
+            margin: 20px 0;
+            padding-top: 20px;
+        }
+
+        .flex-container {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+        }
+
+        .column {
+            flex: 1;
+        }
+
+        .column.objetos-personales .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .column.tareas .radio-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .column.tareas .radio-group label {
+            height: 40px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .flex-container {
+                flex-direction: column;
+            }
+
+            .radio-group {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .btn-container {
+                display: flex;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            button {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .radio-group {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <div id="login-container">
+        <div id="login-form">
+            <h2>
+                <span class="header-icon cart-icon">🛒</span>
+                BIENVENIDOS A BODEGA DIGITAL
+                <span class="header-icon cart-icon">🛒</span>
+            </h2>
+            <input type="text" id="username" placeholder="Usuario" required>
+            <input type="password" id="password" placeholder="Contraseña" required>
+            <button onclick="iniciarSesion()">INICIAR SESIÓN</button>
+        </div>
+    </div>
+
+    <div id="main-content" style="display: none;">
+        <div class="container">
+            <div class="imagen-container">
+                <img id="imagenSuperior" class="imagen-superior" src="https://co.tubono.com/wp-content/uploads/sites/17/2023/12/ktronix-alkosto.png" alt="LOGO ALKOSTO">
+            </div>
+
+            <h1>
+                <span class="header-icon cart-icon">🛒</span>
+                REGISTRO EMPLEADOS A BODEGA DIGITAL
+                <span class="header-icon cart-icon">🛒</span>
+            </h1>
+
+            <div class="tabs">
+                <button class="tab active" data-tab="registro-horas">REGISTRO DE HORAS</button>
+                <button class="tab" data-tab="registro-empleados">REGISTRO DE EMPLEADOS</button>
+            </div>
+
+            <div id="registro-horas" class="tab-content active">
+                <h2>REGISTRO DE HORAS</h2>
+                <form id="employee-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="cedula">CÉDULA:</label>
+                            <input type="text" id="cedula" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="nombre">NOMBRE:</label>
+                            <input type="text" id="nombre" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="area">ÁREA:</label>
+                            <input type="text" id="area" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="hora-registro">HORA DE REGISTRO:</label>
+                            <input type="text" id="hora-registro" readonly>
+                        </div>
+                    </div>
+                    <div class="flex-container">
+                        <div class="column objetos-personales">
+                            <div class="form-group" id="objetos-personales-group">
+                                <label>OBJETOS PERSONALES:</label>
+                                <div class="checkbox-group">
+                                    <label>
+                                        <input type="checkbox" id="banda-reloj-inteligente" name="objetos-personales" value="BANDA-RELOJ-INTELIGENTE">
+                                        BANDA/RELOJ INTELIGENTE
+                                    </label>
+                                    <label>
+                                        <input type="checkbox" id="celular-corporativo" name="objetos-personales" value="CELULAR-CORPORATIVO">
+                                        CELULAR CORPORATIVO
+                                    </label>
+                                    <label>
+                                        <input type="checkbox" id="computador-portatil" name="objetos-personales" value="COMPUTADOR-PORTATIL">
+                                        COMPUTADOR PORTÁTIL
+                                    </label>
+                                    <label>
+                                        <input type="checkbox" id="no-ingresa-nada" name="objetos-personales" value="NO-INGRESA-NADA">
+                                        NO INGRESA NADA
+                                    
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column tareas">
+                            <div class="form-group" id="tareas-group">
+                                <label>TAREAS A REALIZAR:</label>
+                                <div class="radio-group">
+                                    <label>
+                                        <input type="radio" name="tareas" value="TAREAS-DIARIAS-DIGI">
+                                        <span>TAREAS DIARIAS DIGI</span>
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="tareas" value="APOYO-TAREAS-DIGI">
+                                        <span>APOYO TAREAS DIGI</span>
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="tareas" value="INVENTARIO">
+                                        <span>INVENTARIO</span>
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="tareas" value="INVENTARIO-SELECTIVO">
+                                        <span>INVENTARIO SELECTIVO</span>
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="tareas" value="SISTEMAS">
+                                        <span>SISTEMAS</span>
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="tareas" value="REVISION-DE-PROCESOS">
+                                        <span>REVISIÓN DE PROCESOS</span>
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="tareas" value="SUPERVISOR">
+                                        <span>SUPERVISOR / ADMIN</span>
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="tareas" value="MANTENIMIENTO">
+                                        <span>MANTENIMIENTO</span>
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="tareas" value="PERSONAL-EXTERNO">
+                                        <span>PERSONAL EXTERNO</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" id="guardar-entrada">REGISTRAR ENTRADA</button>
+                </form>
+
+                <div class="tabla-container" style="display: none;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>NOMBRE</th>
+                                <th>CÉDULA</th>
+                                <th>ÁREA</th>
+                                <th>REGISTROS</th>
+                                <th>ACCIONES</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-registro">
+                            <!-- Filas generadas dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="btn-container">
+                    <button id="generar-excel">GENERAR EXCEL</button>
+                    <button id="mostrar-todos">MOSTRAR TODOS LOS REGISTROS</button>
+                </div>
+            </div>
+
+            <div id="registro-empleados" class="tab-content">
+                <h2>REGISTRO DE EMPLEADOS</h2>
+                <form id="new-employee-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="new-cedula">CÉDULA:</label>
+                            <input type="text" id="new-cedula" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="new-nombre">NOMBRE:</label>
+                            <input type="text" id="new-nombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="new-area">ÁREA:</label>
+                            <select id="new-area" required>
+                                <option value="">SELECCIONE UN ÁREA</option>
+                                <option value="ADMINISTRACION">ADMINISTRACIÓN</option>
+                                <option value="PUNTO_DE_VENTA">PUNTO DE VENTA</option>
+                                <option value="EXTERNO">EXTERNO</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="button" id="registrar-empleado">REGISTRAR EMPLEADO</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let empleados = [];
+        let mostrandoTodos = false;
+        let timerOcultarTabla;
+        let intervalActualizarHora;
+
+        // Objeto para correcciones ortográficas
+        const correccionesOrtograficas = {
+            'REVICION': 'REVISIÓN',
+            'REVICION DE PROCESOS': 'REVISIÓN DE PROCESOS',
+            'REVICION DE MALLAS': 'REVISIÓN DE MALLAS'
+        };
+
+        // Función para iniciar sesión
+        function iniciarSesion() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (username === '0000' && password === '0000') {
+                document.getElementById('login-container').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+                localStorage.setItem('sesionIniciada', 'true');
+                iniciarActualizacionHora();
+            } else {
+                alert('Usuario o contraseña incorrectos');
+            }
+        }
+
+        // Función para verificar si la sesión está iniciada
+        function verificarSesion() {
+            if (localStorage.getItem('sesionIniciada') === 'true') {
+                document.getElementById('login-container').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+                iniciarActualizacionHora();
+            } else {
+                document.getElementById('login-container').style.display = 'flex';
+                document.getElementById('main-content').style.display = 'none';
+            }
+        }
+
+        // Evento que se ejecuta cuando el DOM está completamente cargado
+        document.addEventListener('DOMContentLoaded', () => {
+            verificarSesion();
+            cargarDatos();
+            initEventListeners();
+            setFechaHoraActual();
+        });
+
+        // Función para inicializar los event listeners
+        function initEventListeners() {
+            document.getElementById('cedula').addEventListener('input', buscarEmpleado);
+            document.getElementById('guardar-entrada').addEventListener('click', () => registrarHora('ENTRADA'));
+            document.getElementById('registrar-empleado').addEventListener('click', registrarEmpleado);
+            document.getElementById('generar-excel').addEventListener('click', generarExcel);
+            document.getElementById('mostrar-todos').addEventListener('click', toggleMostrarTodos);
+
+            // Convertir texto a mayúsculas
+            document.querySelectorAll('input[type="text"], select').forEach(input => {
+                input.addEventListener('input', function() {
+                    this.value = this.value.toUpperCase();
+                });
+            });
+
+            // Manejo de pestañas
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    activateTab(tabId);
+                });
+            });
+        }
+
+        // Función para iniciar la actualización de la hora
+        function iniciarActualizacionHora() {
+            if (intervalActualizarHora) {
+                clearInterval(intervalActualizarHora);
+            }
+            intervalActualizarHora = setInterval(setFechaHoraActual, 1000);
+        }
+
+        // Función para establecer la fecha y hora actual
+        function setFechaHoraActual() {
+            const ahora = new Date();
+            const opciones = { 
+                year: 'numeric', 
+                month: '2-digit', 
+                day: '2-digit', 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit', 
+                hour12: false 
+            };
+            const fechaHoraLocal = ahora.toLocaleString('es-CO', opciones).replace(/\//g, '-');
+            document.getElementById('hora-registro').value = fechaHoraLocal;
+        }
+
+        // Función para activar una pestaña
+        function activateTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(tabId).classList.add('active');
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+        }
+
+        // Función para buscar un empleado por cédula
+        function buscarEmpleado() {
+            const cedula = document.getElementById('cedula').value.toUpperCase();
+            const empleadoExistente = empleados.find(empleado => empleado.cedula === cedula);
+
+            const nombreInput = document.getElementById('nombre');
+            const areaInput = document.getElementById('area');
+
+            if (empleadoExistente) {
+                nombreInput.value = empleadoExistente.nombre.toUpperCase();
+                areaInput.value = empleadoExistente.area.toUpperCase();
+            } else {
+                nombreInput.value = '';
+                areaInput.value = '';
+            }
+        }
+
+        // Función para registrar hora de entrada o salida
+        function registrarHora(tipo, cedula = null) {
+            const cedulaInput = cedula || document.getElementById('cedula').value.toUpperCase();
+            const horaRegistro = document.getElementById('hora-registro').value;
+
+            let empleado = empleados.find(emp => emp.cedula === cedulaInput);
+
+            if (!empleado) {
+                alert('EMPLEADO NO ENCONTRADO. POR FAVOR, REGISTRE AL EMPLEADO PRIMERO.');
+                return;
+            }
+
+            if (tipo === 'ENTRADA') {
+                if (empleado.registros.length > 0 && empleado.registros[empleado.registros.length - 1].tipo === 'ENTRADA') {
+                    alert('YA EXISTE UN REGISTRO DE ENTRADA SIN SALIDA PARA ESTE EMPLEADO.');
+                    return;
+                }
+
+                let registro = { 
+                    tipo, 
+                    hora: horaRegistro,
+                    objetosPersonales: obtenerObjetosPersonales(),
+                    tarea: obtenerTareaSeleccionada()
+                };
+                
+                if (!cedulaInput || !registro.tarea || registro.objetosPersonales.length === 0) {
+                    alert('FALTAN CAMPOS POR LLENAR. POR FAVOR, COMPLETE TODOS LOS CAMPOS.');
+                    return;
+                }
+
+                empleado.registros.push(registro);
+            } else if (tipo === 'SALIDA') {
+                if (empleado.registros.length === 0 || empleado.registros[empleado.registros.length - 1].tipo === 'SALIDA') {
+                    alert('NO HAY UN REGISTRO DE ENTRADA PREVIO PARA ESTE EMPLEADO.');
+                    return;
+                }
+
+                // Obtener los datos de la entrada correspondiente
+                const ultimaEntrada = empleado.registros[empleado.registros.length - 1];
+                let registro = { 
+                    tipo, 
+                    hora: horaRegistro,
+                    objetosPersonales: ultimaEntrada.objetosPersonales,
+                    tarea: ultimaEntrada.tarea
+                };
+
+                empleado.registros.push(registro);
+            }
+
+            guardarDatos();
+            actualizarTabla();
+            limpiarFormulario();
+        }
+
+        // Función para obtener los objetos personales seleccionados
+        function obtenerObjetosPersonales() {
+            return Array.from(document.querySelectorAll('input[name="objetos-personales"]:checked'))
+                .map(checkbox => checkbox.value);
+        }
+
+        // Función para obtener la tarea seleccionada
+        function obtenerTareaSeleccionada() {
+            const tareaSeleccionada = document.querySelector('input[name="tareas"]:checked');
+            return tareaSeleccionada ? tareaSeleccionada.value : null;
+        }
+
+        // Función para registrar un nuevo empleado
+        function registrarEmpleado() {
+            const cedula = document.getElementById('new-cedula').value.toUpperCase();
+            const nombre = document.getElementById('new-nombre').value.toUpperCase();
+            const area = document.getElementById('new-area').value.toUpperCase();
+
+            if (!cedula || !nombre || !area) {
+                alert('TODOS LOS CAMPOS SON OBLIGATORIOS');
+                return;
+            }
+
+            if (empleados.some(emp => emp.cedula === cedula)) {
+                alert('YA EXISTE UN EMPLEADO CON ESTA CÉDULA');
+                return;
+            }
+
+            empleados.push({ cedula, nombre, area, registros: [] });
+            guardarDatos();
+            alert('EMPLEADO REGISTRADO CON ÉXITO');
+            document.getElementById('new-employee-form').reset();
+        }
+
+        // Función para generar el archivo Excel
+        function generarExcel() {
+            const workbook = XLSX.utils.book_new();
+            const worksheet = XLSX.utils.json_to_sheet(empleados.flatMap(empleado => 
+                empleado.registros.map(registro => ({
+                    CEDULA: empleado.cedula,
+                    NOMBRE: empleado.nombre,
+                    AREA: empleado.area,
+                    TIPO: registro.tipo,
+                    HORA: registro.hora,
+                    OBJETOS_PERSONALES: registro.objetosPersonales ? registro.objetosPersonales.join(', ') : '',
+                    TAREA: registro.tarea || ''
+                }))
+            ));
+
+            // Ajustar automáticamente el ancho de las columnas
+            const maxWidth = 50;
+            const columnas = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+            columnas.forEach(col => {
+                let maxLength = 20;
+                XLSX.utils.sheet_to_json(worksheet).forEach(row => {
+                    const cellValue = row[XLSX.utils.decode_col(col)];
+                    if (cellValue) {
+                        maxLength = Math.max(maxLength, cellValue.toString().length);
+                    }
+                });
+                worksheet['!cols'] = worksheet['!cols'] || [];
+                worksheet['!cols'][XLSX.utils.decode_col(col)] = { 
+                    wch: Math.min(maxLength, maxWidth)
+                };
+            });
+
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Registros");
+            XLSX.writeFile(workbook, "registros_bodega_digital.xlsx");
+
+            // Limpiar los registros de la interfaz
+            empleados.forEach(empleado => {
+                empleado.registros = [];
+            });
+
+            // Actualizar la tabla y limpiar el formulario
+            actualizarTabla();
+            limpiarFormulario();
+
+            alert('SE HA GENERADO EL EXCEL CON TODOS LOS REGISTROS DE INGRESO Y SALIDA. LOS REGISTROS HAN SIDO BORRADOS DE LA INTERFAZ PERO SE MANTIENEN EN EL ALMACENAMIENTO LOCAL.');
+        }
+
+        // Función para mostrar/ocultar todos los registros
+        function toggleMostrarTodos() {
+            mostrandoTodos = !mostrandoTodos;
+            actualizarTabla();
+            document.getElementById('mostrar-todos').textContent = mostrandoTodos ? 'OCULTAR REGISTROS' : 'MOSTRAR TODOS LOS REGISTROS';
+        }
+
+        // Función para actualizar la tabla de registros
+        function actualizarTabla() {
+            const tabla = document.getElementById('tabla-registro');
+            tabla.innerHTML = '';
+
+            empleados.forEach(empleado => {
+                if (mostrandoTodos || (empleado.registros.length > 0 && empleado.registros[empleado.registros.length - 1].tipo === 'ENTRADA')) {
+                    const fila = tabla.insertRow();
+                    fila.insertCell().textContent = empleado.nombre;
+                    fila.insertCell().textContent = empleado.cedula;
+                    fila.insertCell().textContent = empleado.area;
+
+                    const registrosCell = fila.insertCell();
+                    registrosCell.innerHTML = empleado.registros.map(registro => 
+                        `${registro.tipo}: ${registro.hora}<br>
+                        Objetos: ${registro.objetosPersonales ? registro.objetosPersonales.join(', ') : 'N/A'}<br>
+                        Tarea: ${registro.tarea || 'N/A'}`
+                    ).join('<br><br>');
+
+                    const accionesCell = fila.insertCell();
+                    if (empleado.registros.length > 0 && empleado.registros[empleado.registros.length - 1].tipo === 'ENTRADA') {
+                        const botonSalida = document.createElement('button');
+                        botonSalida.textContent = 'GENERAR SALIDA';
+                        botonSalida.classList.add('generar-salida');
+                        botonSalida.onclick = () => {
+                            registrarHora('SALIDA', empleado.cedula);
+                            botonSalida.classList.add('clicked');
+                            setTimeout(() => botonSalida.classList.remove('clicked'), 200);
+                        };
+                        accionesCell.appendChild(botonSalida);
+                    }
+                }
+            });
+
+            document.querySelector('.tabla-container').style.display = 'block';
+
+            if (timerOcultarTabla) {
+                clearTimeout(timerOcultarTabla);
+            }
+            timerOcultarTabla = setTimeout(() => {
+                if (!mostrandoTodos) {
+                    document.querySelector('.tabla-container').style.display = 'none';
+                }
+            }, 60000);
+        }
+
+        // Función para limpiar el formulario
+        function limpiarFormulario() {
+            document.getElementById('cedula').value = '';
+            document.getElementById('nombre').value = '';
+            document.getElementById('area').value = '';
+            document.querySelectorAll('input[name="objetos-personales"]').forEach(checkbox => checkbox.checked = false);
+            document.querySelectorAll('input[name="tareas"]').forEach(radio => radio.checked = false);
+        }
+
+        // Función para cargar datos desde localStorage
+        function cargarDatos() {
+            const datosGuardados = localStorage.getItem('empleados');
+            if (datosGuardados) {
+                empleados = JSON.parse(datosGuardados);
+            }
+        }
+
+        // Función para guardar datos en localStorage
+        function guardarDatos() {
+            localStorage.setItem('empleados', JSON.stringify(empleados));
+        }
+
+        // Función para corregir ortografía
+        function corregirOrtografia(texto) {
+            return correccionesOrtograficas[texto] || texto;
+        }
+    </script>
+</body>
+</html>
